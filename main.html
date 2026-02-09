@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل دانش‌آموز</title>
+    <link rel="shortcut icon" href="./logo.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #0f3460, #00D084);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard-header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .header-title {
+            color: white;
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .modules-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            margin: 20px 15px;           /* فاصله از کناره‌ها کمتر */
+            padding: 20px;               /* پدینگ کمتر */
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 500px;            /* حداکثر عرض محدود */
+            width: 90%;                  /* در موبایل تقریباً تمام عرض */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .today-day {
+            font-size: 18px;
+            color: #003366;
+            margin: 0;
+        }
+        body.dark .today-day{
+            font-size: 18px;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .today-date {
+            font-size: 22px;
+            font-weight: bold;
+            color: #00D084;
+            margin: 5px 0 20px;
+        }
+
+        .modules-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .module-btn {
+            background: #00D084;
+            color: white;
+            padding: 18px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 6px 15px rgba(0,208,132,0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,208,132,0.5);
+        }
+
+        /* سایدبار */
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            right: -320px; /* مخفی در حالت بسته */
+            width: 320px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: -8px 0 25px rgba(0,0,0,0.15);
+            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease;
+            z-index: 2000;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none; /* غیرفعال وقتی بسته است */
+        }
+        
+        .sidebar-menu.open {
+            right: 0;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .menu-header {
+            padding: 18px 25px;
+            background: linear-gradient(135deg, #00D084, #00b36b);
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        .menu-header p {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-menu {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 32px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .close-menu:hover {
+            transform: rotate(90deg);
+        }
+
+        .menu-items {
+            padding: 10px 0;
+        }
+
+        .menu-items a {
+            display: block;
+            padding: 14px 25px;
+            color: #444;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-items a:hover {
+            background: rgba(0, 208, 132, 0.08);
+            color: #00D084;
+            padding-left: 35px;
+            border-left: 4px solid #00D084;
+        }
+
+        /* toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 16px 32px;
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .toast.success { background: #4caf50; }
+        .toast.error   { background: #f44336; }
+
+        /* آیکن چت */
+        .support-icon {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 9999;
+            background: #00D084;
+            color: white;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 25px rgba(0,208,132,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .support-icon:hover {
+            transform: scale(1.12);
+            box-shadow: 0 15px 35px rgba(0,208,132,0.6);
+        }
+
+        /* کادر چت */
+        #support-modal {
+            position: fixed;
+            bottom: 110px;
+            left: 30px;
+            width: 360px;
+            max-height: 65vh;
+            background: transparent;
+            z-index: 10000;
+            display: none;
+        }
+
+        #support-modal.show {
+            display: block;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 -12px 35px rgba(0,0,0,0.25);
+            overflow: hidden;
+            border: 1px solid rgba(0,208,132,0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .modal-box h2 {
+            margin: 0;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #00D084, #00b36b);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        #support-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #00D084;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.admin {
+            background: #e0e0e0;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        #support-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 1.5px solid #ddd;
+            border-radius: 30px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        #send-support-btn {
+            margin-left: 10px;
+            background: #00D084;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #send-support-btn:hover {
+            background: #00b36b;
+            transform: scale(1.1);
+        }
+
+        .close {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            font-size: 32px;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        @media (max-width: 480px) {
+            #support-modal {
+                bottom: 90px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-height: 60vh;
+            }
+
+            .support-icon {
+                bottom: 20px;
+                left: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 28px;
+            }
+        }
+        body.dark {
+            background: linear-gradient(135deg, #0f1a3a, #004d40);
+            color: #e0e0e0;
+        }
+
+        body.dark .container,
+        body.dark .modules-card,
+        body.dark .sidebar-menu,
+        body.dark .modal-box {
+            background: rgba(30, 30, 50, 0.95);
+            color: #e0e0e0;
+            border: 1px solid #444;
+        }
+
+        body.dark .module-btn {
+            background: #00b36b;
+        }
+
+        body.dark .module-btn:hover {
+            background: #00995c;
+        }
+
+        body.dark #support-messages {
+            background: #222;
+        }
+
+        body.dark .message.admin {
+            background: #444;
+            color: #e0e0e0;
+        }
+
+        body.dark .input-area {
+            background: #222;
+        }
+
+        body.dark #support-input {
+            background: #333;
+            color: white;
+            border-color: #555;
+        }
+        @media (max-width: 600px) {
+            .modules-card {
+                margin: 15px 10px;
+                padding: 18px;
+            }
+        
+            .modules-section {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        
+            .module-btn {
+                padding: 16px;
+                font-size: 17px;
+            }
+        }
+
+        @media (min-width: 601px) {
+            .modules-card {
+                margin: 30px auto;
+                max-width: 600px;
+            }
+        }
+        body.dark .sidebar-menu {
+            background: rgba(25, 25, 40, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: -8px 0 25px rgba(0,0,0,0.4);
+        }
+
+        body.dark .menu-items a {
+            color: #e0e0e0;
+        }
+
+        body.dark .menu-items a:hover {
+            background: rgba(0, 255, 157, 0.12);
+            color: #00ff9d;
+            border-left: 4px solid #00ff9d;
+        }
+
+        /* ریسپانسیو */
+        @media (max-width: 480px) {
+            .sidebar-menu {
+                width: 280px;
+                right: -280px;
+            }
+        
+            .sidebar-menu.open {
+                right: 0;
+            }
+        
+            .menu-items a {
+                font-size: 15px;
+                padding: 14px 20px;
+            }
+        }
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            padding: 20px 15px;
+            box-sizing: border-box;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        /* کادر اصلی مدال - ارتفاع دقیق و خودکار */
+        .modal .modal-box,
+        .modal .login-box,
+        .modal .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+            width: 460px;               /* عرض ثابت و دلخواه */
+            max-width: 92%;             /* در موبایل کوچکتر نشود */
+            min-width: 320px;
+            height: auto;               /* ارتفاع دقیقاً به اندازه محتوا */
+            max-height: 90vh;           /* فقط در صورت زیاد بودن محتوا اسکرول شود */
+            overflow-y: auto;
+            position: relative;
+            padding: 24px 28px 32px;
+            border: 1px solid rgba(0, 208, 132, 0.12);
+            animation: modalPop 0.35s ease-out;
+        }
+
+        /* انیمیشن */
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.88) translateY(30px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* عنوان مدال - بدون پس‌زمینه سبز */
+        .modal h2 {
+            margin: 0 0 20px 0;
+            padding: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #003366;
+            text-align: center;
+            background: none;
+        }
+
+        /* دکمه بستن (×) - سمت چپ کادر (در rtl یعنی سمت راست صفحه) */
+        .modal .close {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            font-size: 34px;
+            font-weight: 300;
+            color: #777;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.25s ease;
+            background: rgba(0,0,0,0.06);
+            z-index: 10;
+        }
+
+        .modal .close:hover {
+            color: #e74c3c;
+            background: rgba(231,76,60,0.12);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        /* محتوای داخل مدال */
+        .modal-box p,
+        .info-row {
+            font-size: 14.5px;
+            line-height: 1.7;
+            color: #444;
+            margin: 10px 0;
+        }
+
+        /* ریسپانسیو - اندازه دقیق‌تر در موبایل */
+        @media (max-width: 480px) {
+            .modal .modal-box,
+            .modal .login-box,
+            .modal .modal-content {
+                width: 94%;
+                max-width: none;
+                padding: 20px 24px;
+                border-radius: 16px;
+            }
+        
+            .modal h2 {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+        
+            .modal .close {
+                top: 14px;
+                right: 16px;
+                font-size: 32px;
+                width: 38px;
+                height: 38px;
+            }
+        }
+
+        /* گروه ورودی‌ها */
+        .input-group {
+            margin: 14px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* اینپوت و سلکت */
+        .input-group input,
+        .input-group select {
+            width: 400px;
+            padding: 11px 14px;          /* کوچکتر از قبل */
+            border: 1.5px solid #ddd;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #fafafa;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #00D084;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,208,132,0.12);
+            outline: none;
+        }
+
+        /* دکمه‌های اصلی مدال */
+        .login-btn, #save-info-btn, #submit-student-register {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0 10px;
+            background: linear-gradient(135deg, #00D084, #00b36b);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,208,132,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover, #save-info-btn:hover, #submit-student-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,208,132,0.45);
+        }
+
+        /* ردیف‌های اطلاعات (در مدال اطلاعات من) */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .info-value {
+            color: #222;
+            font-weight: 500;
+        }
+        body.dark .info-value{
+            color: #ffffff;
+        }
+
+        /* آیکون ویرایش */
+        .edit-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #00D084;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .edit-icon:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        /* محتوای ثابت (معلمان، درباره مدرسه) */
+        .modal-box p {
+            margin: 12px 0;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        /* ریسپانسیو */
+        @media (max-width: 480px) {
+            .modal .modal-box,
+            .modal .login-box,
+            .modal .modal-content {
+                width: 94%;
+                max-width: none;
+                margin: 0 3%;
+                border-radius: 16px;
+            }
+        
+            .modal h2 {
+                font-size: 20px;
+                padding: 18px 15px 10px;
+            }
+        
+            .input-group {
+                margin: 16px 15px;
+            }
+        
+            .login-btn, #save-info-btn, #submit-student-register {
+                padding: 14px;
+                font-size: 16px;
+            }
+        }
+        
+
+        .modal .modal-box {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 90%;
+            width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+        .login-btn,
+        #save-info-btn,
+        #submit-student-register {
+            width: 100%;
+            padding: 13px;               /* کوچکتر */
+            margin: 18px 0 8px;
+            background: linear-gradient(135deg, #00D084, #00b36b);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,208,132,0.25);
+            transition: all 0.25s ease;
+        }
+        
+        .login-btn:hover,
+        #save-info-btn:hover,
+        #submit-student-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,208,132,0.35);
+        }
+        @media (max-width: 480px) {
+            .modal .modal-box,
+            .modal .login-box,
+            .modal .modal-content {
+                width: 94%;
+                padding: 20px 22px;
+                border-radius: 14px;
+            }
+        
+            .modal h2 {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+        
+            .input-group {
+                margin: 12px 0;
+            }
+        
+            .input-group input,
+            .input-group select {
+                padding: 10px 12px;
+                font-size: 14.5px;
+            }
+        
+            .login-btn,
+            #save-info-btn,
+            #submit-student-register {
+                padding: 12px;
+                font-size: 15px;
+            }
+        }
+        .teach{
+            
+            line-height:1.8; 
+            font-size:15px; 
+            color:#444;
+        }
+        body.dark .teach{
+            color: #ffffff;
+        }
+
+        .editable .edit-icon {
+            display: none !important;
+        }
+        .snow-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .snowflake {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            box-shadow: 0 0 6px rgba(255,255,255,0.9);
+            animation: fall linear infinite;
+            top: -20px;
+        }
+
+        /* انیمیشن افتادن برف */
+        @keyframes fall {
+            0% {
+                transform: translateY(-20vh) translateX(0vw) rotate(0deg);
+            }
+            100% {
+                transform: translateY(120vh) translateX(30vw) rotate(720deg);
+            }
+        }
+
+        /* تعداد دونه‌ها و موقعیت شروع (از بالا-راست) */
+        .snowflake:nth-child(1)  { left: 3%;  animation-duration: 7s;   animation-delay: 0s;   }
+        .snowflake:nth-child(2)  { left: 6%;  animation-duration: 6.5s; animation-delay: 0.4s; }
+        .snowflake:nth-child(3)  { left: 9%;  animation-duration: 8s;   animation-delay: 0.9s; }
+        .snowflake:nth-child(4)  { left: 12%; animation-duration: 5.8s; animation-delay: 1.3s; }
+        .snowflake:nth-child(5)  { left: 15%; animation-duration: 7.2s; animation-delay: 1.9s; }
+        .snowflake:nth-child(6)  { left: 18%; animation-duration: 6.8s; animation-delay: 0.6s; }
+        .snowflake:nth-child(7)  { left: 21%; animation-duration: 9s;   animation-delay: 2.6s; }
+        .snowflake:nth-child(8)  { left: 24%; animation-duration: 6.4s; animation-delay: 1.6s; }
+        .snowflake:nth-child(9)  { left: 27%; animation-duration: 8.2s; animation-delay: 3.1s; }
+        .snowflake:nth-child(10) { left: 30%; animation-duration: 7.5s; animation-delay: 1.0s; }
+        .snowflake:nth-child(11) { left: 33%; animation-duration: 7.8s; animation-delay: 2.3s; }
+        .snowflake:nth-child(12) { left: 36%; animation-duration: 6.2s; animation-delay: 1.8s; }
+        .snowflake:nth-child(13) { left: 39%; animation-duration: 8.5s; animation-delay: 3.6s; }
+        .snowflake:nth-child(14) { left: 42%; animation-duration: 9.2s; animation-delay: 4.1s; }
+        .snowflake:nth-child(15) { left: 45%; animation-duration: 6.8s; animation-delay: 0.5s; }
+        .snowflake:nth-child(16) { left: 48%; animation-duration: 7.4s; animation-delay: 2.9s; }
+        .snowflake:nth-child(17) { left: 51%; animation-duration: 8s;   animation-delay: 1.4s; }
+        .snowflake:nth-child(18) { left: 54%; animation-duration: 10s;  animation-delay: 4.6s; }
+        .snowflake:nth-child(19) { left: 57%; animation-duration: 7.2s; animation-delay: 0.8s; }
+        .snowflake:nth-child(20) { left: 60%; animation-duration: 8.8s; animation-delay: 3.3s; }
+        .snowflake:nth-child(21) { left: 63%; animation-duration: 6.6s; animation-delay: 2.2s; }
+        .snowflake:nth-child(22) { left: 66%; animation-duration: 9.2s; animation-delay: 5.1s; }
+        .snowflake:nth-child(23) { left: 69%; animation-duration: 7.8s; animation-delay: 1.7s; }
+        .snowflake:nth-child(24) { left: 72%; animation-duration: 8.4s; animation-delay: 3.9s; }
+        .snowflake:nth-child(25) { left: 75%; animation-duration: 6.4s; animation-delay: 0.9s; }
+        .snowflake:nth-child(26) { left: 78%; animation-duration: 9.5s; animation-delay: 4.4s; }
+        .snowflake:nth-child(27) { left: 81%; animation-duration: 7s;   animation-delay: 1.5s; }
+        .snowflake:nth-child(28) { left: 84%; animation-duration: 8.2s; animation-delay: 3.7s; }
+        .snowflake:nth-child(29) { left: 87%; animation-duration: 6.8s; animation-delay: 2.5s; }
+        .snowflake:nth-child(30) { left: 90%; animation-duration: 10s;  animation-delay: 5.6s; }
+        .snowflake:nth-child(31) { left: 93%; animation-duration: 7.2s; animation-delay: 0.7s; }
+        .snowflake:nth-child(32) { left: 96%; animation-duration: 8.5s; animation-delay: 4.9s; }
+        .snowflake:nth-child(33) { left: 98%; animation-duration: 6s;   animation-delay: 1.1s; }
+        .snowflake:nth-child(34) { left: 99%; animation-duration: 9s;   animation-delay: 4.2s; }
+        .snowflake:nth-child(35) { left: 4%;  animation-duration: 7.5s; animation-delay: 2.8s; }
+        .snowflake:nth-child(36) { left: 7%;  animation-duration: 8s;   animation-delay: 3.4s; }
+        .snowflake:nth-child(37) { left: 11%; animation-duration: 6.5s; animation-delay: 0.2s; }
+        .snowflake:nth-child(38) { left: 14%; animation-duration: 8.8s; animation-delay: 4.7s; }
+        .snowflake:nth-child(39) { left: 17%; animation-duration: 7s;   animation-delay: 1.9s; }
+        .snowflake:nth-child(40) { left: 19%; animation-duration: 9.2s; animation-delay: 5.3s; }
+
+        .snowflake.small  { width: 4px; height: 4px; }
+        .snowflake.large  { width: 8px; height: 8px; opacity: 0.95; }
+    </style>
+</head>
+<body>
+    <div class="snow-container">
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+    </div>
+
+    <header class="dashboard-header">
+        <button id="hamburger-btn" class="hamburger-btn">☰</button>
+        <h2 class="header-title">به نام خدا</h2>
+        <button id="theme-toggle-btn" class="theme-toggle-btn">🌙</button>
+    </header>
+
+    <div class="modules-card">
+        <p class="today-day">امروز</p>
+        <p class="today-date" id="today-date"></p>
+
+        <div class="modules-section">
+            <a href="./podman.html" class="module-btn">پودمان‌ها</a>
+            <!-- دکمه‌های دیگر رو اگر داری اضافه کن -->
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- سایدبار (منوی همبرگری) -->
+    <div id="sidebar-menu" class="sidebar-menu">
+        <div class="menu-header">
+            <span id="close-menu" class="close-menu">×</span>
+            <p id="user-name-display">دانش‌آموز</p>
+        </div>
+        <div class="menu-items">
+            <a href="#" data-target="student-register-modal">👨🏻‍🎓 ثبت دانش‌آموزی</a>
+            <a href="#" data-target="my-info-modal">🙋🏻‍♂️ اطلاعات من</a>
+            <a href="#" data-target="teachers-modal">👨🏻‍🏫 معلمان</a>
+            <!-- <a href="#" onclick="openDevicesModal()">💻 دستگاه ها</a> -->
+            <a href="#" data-target="about-school-modal">⛪ درباره مدرسه</a>
+            <!-- <a href="#" id="messenger-link">💬 پیام رسان</a> -->
+            <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: rgba(255,255,255,0.8); border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <span style="font-size: 15px; color: #666; font-weight: 600;">نسخه آزمایشی لوکال</span>
+                <span id="logout-btn" style="cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-sign-out-alt" style="font-size: 28px; color: #e74c3c;"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- مدال ثبت دانش‌آموزی -->
+    <div id="student-register-modal" class="modal">
+        <div class="login-box modal-box">
+            <span class="close" data-modal="student-register-modal">×</span>
+            <h2>👨🏻‍🎓 ثبت دانش‌آموزی</h2>
+        
+            <div class="input-group">
+                <label>پایه تحصیلی</label>
+                <select id="grade-select">
+                    <option value="">انتخاب پایه</option>
+                    <option value="دهم">دهم</option>
+                    <option value="یازدهم">یازدهم</option>
+                    <option value="دوازدهم">دوازدهم</option>
+                </select>
+            </div>
+        
+            <div class="input-group">
+                <label>رشته تحصیلی</label>
+                <select id="field-select">
+                    <option value="">انتخاب رشته</option>
+                    <option value="شبکه و نرم افزار">شبکه و نرم افزار</option>
+                    <option value="تأسیسات مکانیکی">تأسیسات مکانیکی</option>
+                    <option value="مکانیک خودرو">مکانیک خودرو</option>
+                    <option value="حسابداری">حسابداری</option>
+                    <option value="الکتروتکنیک">الکتروتکنیک</option>
+                    <option value="ساختمان">ساختمان</option>
+                </select>
+            </div>
+        
+            <div class="input-group">
+                <label>آدرس کامل</label>
+                <input type="text" id="address" placeholder="آدرس منزل">
+            </div>
+        
+            <div class="input-group">
+                <label>کد پستی</label>
+                <input type="text" id="postal-code" placeholder="کد پستی" maxlength="10">
+            </div>
+        
+            <button id="submit-student-register" class="login-btn">ثبت اطلاعات ✔</button>
+        </div>
+    </div>
+    
+    <!-- مدال دستگاه‌ها (نشست‌های فعال) -->
+    <div id="devices-modal" class="modal">
+        <div class="modal-content settings-modal">
+            <span class="close" data-modal="devices-modal">×</span>
+            <h2>نشست‌های فعال</h2>
+            <div id="devices-list" class="devices-list"></div>
+            <p style="text-align:center; color:#888; margin-top:20px; font-size:14px;">
+                این بخش در نسخه لوکال فقط نمایشی است
+            </p>
+        </div>
+    </div>
+    
+    <!-- مدال اطلاعات من -->
+    <div id="my-info-modal" class="modal">
+        <div class="modal-box">
+            <span class="close" data-modal="my-info-modal">×</span>
+        
+            <h2 style="text-align: center; color: #003366;">🙋🏻‍♂️ اطلاعات من</h2>
+        
+            <div class="info-row">
+                <span class="info-label">کد ملی :</span>
+                <span class="info-value" id="info-nationalCode">فقط خواندنی</span>
+            </div>
+        
+            <div class="info-row">
+                <span class="info-label">شماره تماس :</span>
+                <span class="info-value" id="info-phone">فقط خواندنی</span>
+            </div>
+        
+            <div class="info-row">
+                <span class="info-label">پایه تحصیلی :</span>
+                <span class="info-value" id="info-grade">ثبت نشده</span>
+            </div>
+        
+            <div class="info-row">
+                <span class="info-label">رشته تحصیلی :</span>
+                <span class="info-value" id="info-field">ثبت نشده</span>
+            </div>
+        
+            <!-- تیم فوتبال -->
+            <div class="input-group editable">
+                <label>تیم فوتبال مورد علاقه</label>
+                <input type="text" id="info-favoriteTeam" readonly placeholder="ثبت نشده">
+                <i class="fa-solid fa-pencil edit-icon" onclick="toggleEdit('info-favoriteTeam')"></i>
+            </div>
+        
+            <!-- رنگ مورد علاقه -->
+            <div class="input-group editable">
+                <label>رنگ مورد علاقه</label>
+                <input type="text" id="info-favoriteColor" readonly placeholder="ثبت نشده">
+                <i class="fa-solid fa-pencil edit-icon" onclick="toggleEdit('info-favoriteColor')"></i>
+            </div>
+        
+            <button id="save-info-btn" class="login-btn">ذخیره تغییرات ✔</button>
+        </div>
+    </div>
+    
+    <!-- مدال معلمان -->
+    <div id="teachers-modal" class="modal">
+        <div class="login-box modal-box">
+            <span class="close" data-modal="teachers-modal">×</span>
+            <h2>👨🏻‍🏫 معلمان</h2>
+            <div>
+                <p class="teach"><strong>آقای مهرداد شاه محمدیان</strong><br>سابقه: بیش از ۱۰ سال<br>درس: تاریخ معاصر</p>
+                <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+                <p class="teach"><strong>آقای علیرضا سلطانی</strong><br>سابقه: ۱.۵ سال<br>درس: ادبیات فارسی</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- مدال درباره مدرسه -->
+    <div id="about-school-modal" class="modal">
+        <div class="login-box modal-box">
+            <span class="close" data-modal="about-school-modal">×</span>
+            <h2>⛪ درباره مدرسه</h2>
+            <div>
+                <p class="teach">نام: هنرستان فنی حرفه‌ای آیت الله هاشمی رفسنجانی</p>
+                <p class="teach">موسس: آقای شاهپور کاظمی</p>
+                <p class="teach">سال تأسیس: ۱۳۹۴</p>
+                <p class="teach">مدیریت: جناب آقای نادری فر</p>
+                <p class="teach">استان: تهران – شهر: رودهن</p>
+                <p class="teach">نشانی: خیابان امامت، هنرستان فنی حرفه‌ای آیت الله هاشمی رفسنجانی</p>
+                <p class="teach">تلفن: ۷۶۵۱۶۷۳۷ - ۷۶۵۱۹۵۳۴</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- آیکن چت -->
+    <div class="support-icon" id="support-icon">🎧</div>
+
+    <!-- کادر چت -->
+    <div id="support-modal">
+        <div class="modal-box">
+            <span class="close">×</span>
+            <h2>پشتیبانی آنلاین</h2>
+            <p style="text-align:center;color:#666;font-size:14px;margin:8px 0 16px;">پیام خود را بنویسید</p>
+            <div id="support-messages"></div>
+            <div class="input-area">
+                <input type="text" id="support-input" placeholder="پیام...">
+                <button id="send-support-btn">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // کلید ذخیره‌سازی لوکال
+        const STORAGE_KEY = 'schoolAppData';
+
+        function getAppData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : { users: {}, currentUser: null, chats: {} };
+        }
+
+        function saveAppData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // نمایش toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = type === 'success' ? '#4caf50' : '#f44336';
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        // نمایش تاریخ شمسی
+        function showPersianDate() {
+            const today = new Date();
+            const persianDate = today.toLocaleDateString('fa-IR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('today-date').textContent = persianDate;
+        }
+
+        showPersianDate();
+
+        // لود اطلاعات کاربر فعلی
+        const data = getAppData();
+        if (data.currentUser) {
+            const user = data.users[data.currentUser];
+            if (user) {
+                document.getElementById('user-name-display').textContent = user.fullName || 'دانش‌آموز';
+            }
+        } else {
+            // اگر لاگین نکرده بود، برگرد به ورود
+            window.location.replace('index.html');
+        }
+
+        // خروج
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            if (confirm('آیا می‌خواهید خارج شوید؟')) {
+                localStorage.removeItem('userLoggedIn');
+                window.location.replace('index.html');
+            }
+        });
+
+        // منوی همبرگری
+        document.getElementById('hamburger-btn').addEventListener('click', () => {
+            document.getElementById('sidebar-menu').classList.add('open');
+        });
+
+        document.getElementById('close-menu').addEventListener('click', () => {
+            document.getElementById('sidebar-menu').classList.remove('open');
+        });
+        // تغییر تم (تاریک/روشن)
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const body = document.body;
+
+        function toggleTheme() {
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                themeToggleBtn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.add('dark');
+                themeToggleBtn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // لود تم ذخیره‌شده
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            themeToggleBtn.textContent = '☀️';
+        }
+
+        themeToggleBtn.addEventListener('click', toggleTheme);
+
+        // چت پشتیبانی لوکال
+        document.addEventListener('DOMContentLoaded', () => {
+            let guestId = localStorage.getItem('guestChatId');
+            if (!guestId) {
+                guestId = 'guest-' + Math.floor(100000 + Math.random() * 900000);
+                localStorage.setItem('guestChatId', guestId);
+            }
+
+            const supportIcon = document.getElementById('support-icon');
+            const supportModal = document.getElementById('support-modal');
+            const supportMessages = document.getElementById('support-messages');
+            const supportInput = document.getElementById('support-input');
+            const sendBtn = document.getElementById('send-support-btn');
+
+            if (supportIcon && supportModal) {
+                supportIcon.addEventListener('click', () => {
+                    supportModal.classList.add('show');
+                    loadChatMessages();
+                });
+            }
+
+            document.querySelector('.close')?.addEventListener('click', () => {
+                supportModal.classList.remove('show');
+            });
+
+            supportModal?.addEventListener('click', e => {
+                if (e.target === supportModal) {
+                    supportModal.classList.remove('show');
+                }
+            });
+            
+
+            function loadChatMessages() {
+                const data = getAppData();
+                const chat = data.chats[guestId] || [];
+
+                supportMessages.innerHTML = chat.length === 0 
+                    ? '<p style="text-align:center;color:#999;">حالا سوال یا مشکل خود را بپرسید 😊</p>'
+                    : '';
+
+                chat.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `message ${msg.from}`;
+                    div.textContent = msg.text;
+                    supportMessages.appendChild(div);
+                });
+
+                supportMessages.scrollTop = supportMessages.scrollHeight;
+            }
+
+            function sendSupportMessage() {
+                const text = supportInput.value.trim();
+                if (!text) return;
+
+                const data = getAppData();
+                if (!data.chats[guestId]) data.chats[guestId] = [];
+
+                data.chats[guestId].push({
+                    from: 'user',
+                    text,
+                    timestamp: new Date().toISOString()
+                });
+
+                saveAppData(data);
+                supportInput.value = '';
+                loadChatMessages();
+
+                // شبیه‌سازی پاسخ ادمین بعد از ۱.۵ ثانیه
+                setTimeout(() => {
+                    data.chats[guestId].push({
+                        from: 'admin',
+                        text: 'پیام شما دریافت شد. به زودی پاسخ می‌دهیم.',
+                        timestamp: new Date().toISOString()
+                    });
+                    saveAppData(data);
+                    loadChatMessages();
+                }, 1500);
+            }
+
+            sendBtn?.addEventListener('click', sendSupportMessage);
+            supportInput?.addEventListener('keypress', e => {
+                if (e.key === 'Enter') sendSupportMessage();
+            });
+        });
+        // باز کردن مدال‌ها از منو
+        document.querySelectorAll('.menu-items a[data-target]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // جلوگیری از پرش صفحه
+            
+                const targetId = link.getAttribute('data-target');
+                const modal = document.getElementById(targetId);
+            
+                if (modal) {
+                    modal.style.display = 'flex'; // یا 'block' بسته به استایل
+                    modal.classList.add('show');   // اگر از کلاس show استفاده می‌کنی
+                
+                    // بستن منو بعد از کلیک
+                    document.getElementById('sidebar-menu').classList.remove('open');
+                } else {
+                    console.warn(`مدال با id ${targetId} پیدا نشد`);
+                }
+            });
+        });
+
+        // بستن همه مدال‌ها با کلیک روی دکمه close یا بیرون مدال
+        document.querySelectorAll('.modal .close, .modal').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                if (modal && (e.target.classList.contains('close') || e.target === modal)) {
+                    modal.style.display = 'none';
+                    modal.classList.remove('show');
+                }
+            });
+        });
+        // لود اطلاعات کاربر در مدال "اطلاعات من"
+        function loadUserInfo() {
+            const data = getAppData();
+            const user = data.users[data.currentUser];
+        
+            if (user) {
+                document.getElementById('info-nationalCode').textContent = data.currentUser;
+                document.getElementById('info-phone').textContent = user.phone || 'ثبت نشده';
+                document.getElementById('info-grade').textContent = user.grade || 'ثبت نشده';
+                document.getElementById('info-field').textContent = user.field || 'ثبت نشده';
+                document.getElementById('info-favoriteTeam').value = user.favoriteTeam || 'ثبت نشده';
+                document.getElementById('info-favoriteColor').value = user.favoriteColor || 'ثبت نشده';
+            }
+        }
+
+        // فعال/غیرفعال کردن ویرایش فیلدها
+        function toggleEdit(fieldId) {
+            const input = document.getElementById(fieldId);
+            if (input.readOnly) {
+                input.readOnly = false;
+                input.focus();
+            } else {
+                saveUserInfo();
+                input.readOnly = true;
+            }
+        }
+
+        // ذخیره تغییرات اطلاعات من
+        function saveUserInfo() {
+            const data = getAppData();
+            const user = data.users[data.currentUser];
+        
+            if (user) {
+                user.favoriteTeam = document.getElementById('info-favoriteTeam').value.trim();
+                user.favoriteColor = document.getElementById('info-favoriteColor').value.trim();
+                saveAppData(data);
+                showToast('تغییرات ذخیره شد!', 'success');
+            }
+        }
+
+        // ثبت دانش‌آموزی
+        document.getElementById('submit-student-register')?.addEventListener('click', () => {
+            const grade = document.getElementById('grade-select').value;
+            const field = document.getElementById('field-select').value;
+            const address = document.getElementById('address').value.trim();
+            const postalCode = document.getElementById('postal-code').value.trim();
+        
+            if (!grade || !field) {
+                showToast('پایه و رشته الزامی هستند', 'error');
+                return;
+            }
+        
+            const data = getAppData();
+            const user = data.users[data.currentUser];
+        
+            if (user) {
+                user.grade = grade;
+                user.field = field;
+                user.address = address;
+                user.postalCode = postalCode;
+                user.registered = true;
+                saveAppData(data);
+                showToast('اطلاعات دانش‌آموزی ثبت شد!', 'success');
+            
+                // بستن مدال
+                document.getElementById('student-register-modal').style.display = 'none';
+            }
+        });
+
+        // باز کردن مدال‌ها از منو (این کد رو قبلاً هم داشتی، فقط مطمئن شو هست)
+        document.querySelectorAll('.menu-items a[data-target]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('data-target');
+                const modal = document.getElementById(targetId);
+            
+                if (modal) {
+                    modal.style.display = 'flex';
+                    if (targetId === 'my-info-modal') loadUserInfo(); // لود اطلاعات
+                    document.getElementById('sidebar-menu').classList.remove('open');
+                }
+            });
+        });
+
+        // بستن مدال‌ها
+        document.querySelectorAll('.modal .close, .modal').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                if (modal && (e.target.classList.contains('close') || e.target === modal)) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        const closeBtn = document.querySelector('#support-modal .close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    document.getElementById('support-modal').classList.remove('show');
+                    console.log('کادر چت با × بسته شد'); // برای دیباگ
+                });
+            }
+        
+            // بستن با کلیک بیرون کادر
+            const supportModal = document.getElementById('support-modal');
+            if (supportModal) {
+                supportModal.addEventListener('click', e => {
+                    if (e.target === supportModal) {
+                        supportModal.classList.remove('show');
+                        console.log('کادر چت با کلیک بیرون بسته شد');
+                    }
+                });
+            }
+    </script>
+</body>
+</html>

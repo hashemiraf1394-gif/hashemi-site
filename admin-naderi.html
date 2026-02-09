@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل ادمین - نادری</title>
+    <link rel="shortcut icon" href="./logo.jpg">
+    <link rel="stylesheet" href="./styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f3460, #00D084);
+            font-family: 'Vazirmatn', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .admin-good-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .left-sidebar, .unread-container {
+            width: 22%;
+            background: rgba(255, 255, 255, 0.938);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .left-sidebar {
+            border-left: 1px solid rgba(0, 208, 132, 0.3);
+        }
+
+        .unread-container {
+            border-right: 1px solid rgb(0, 208, 132);
+        }
+
+        .grade-button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: #003366;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .grade-button:hover, .grade-button.active {
+            background: #00D084;
+            transform: translateY(-2px);
+        }
+
+        .discipline-list {
+            display: none;
+            margin-top: 10px;
+            padding-right: 20px;
+        }
+
+        .discipline-button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 208, 132, 0.1);
+            color: #003366;
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .discipline-button:hover, .discipline-button.active {
+            background: #00D084;
+            color: white;
+        }
+
+        .user-list {
+            display: none;
+            margin-top: 10px;
+            padding-right: 30px;
+        }
+
+        .user-item {
+            padding: 14px 18px;
+            background: #f0f8ff;
+            color: #003366;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #00D084;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-item:hover {
+            background: #d0e8ff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+        }
+
+        .chat-header {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #003366;
+            margin-bottom: 20px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: rgba(240, 242, 245, 0.5);
+            border-radius: 16px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message.from-admin {
+            background: #00D084;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.from-user {
+            background: #e0e0e0;
+            color: #333;
+            align-self: flex-start;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input {
+            display: flex;
+            margin-top: 15px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+            background: white;
+        }
+
+        .chat-input button {
+            background: #00D084;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 30px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chat-input button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .unread-item {
+            padding: 15px;
+            background: rgba(217, 45, 45, 0.703);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .unread-item:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .delete-btn-small {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .no-selection {
+            text-align: center;
+            margin-top: 40%;
+            font-size: 20px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .admin-good-container {
+                flex-direction: column;
+            }
+
+            .left-sidebar, .unread-container {
+                width: 100%;
+                height: 30vh;
+            }
+
+            .chat-container {
+                height: 40vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-good-container">
+        <!-- سمت چپ: پایه‌ها و رشته‌ها -->
+        <div class="left-sidebar">
+            <h3 style="text-align: center; color: #003366; margin-bottom: 20px;">انتخاب پایه و رشته</h3>
+            <button class="grade-button" data-grade="دهم">دهم</button>
+            <div class="discipline-list" id="disciplines-دهم"></div>
+            <div class="user-list" id="users-دهم"></div>
+
+            <button class="grade-button" data-grade="یازدهم">یازدهم</button>
+            <div class="discipline-list" id="disciplines-یازدهم"></div>
+            <div class="user-list" id="users-یازدهم"></div>
+
+            <button class="grade-button" data-grade="دوازدهم">دوازدهم</button>
+            <div class="discipline-list" id="disciplines-دوازدهم"></div>
+            <div class="user-list" id="users-دوازدهم"></div>
+        </div>
+
+        <!-- وسط: چت اصلی -->
+        <div class="chat-container">
+            <div class="chat-header" id="chat-header">یک کاربر انتخاب کنید</div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="no-selection">برای شروع چت، یک کاربر از لیست انتخاب کنید</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chat-input-field" placeholder="پیام خود را بنویسید..." disabled>
+                <button id="send-message-btn" disabled>ارسال</button>
+            </div>
+        </div>
+
+        <!-- سمت راست: پیام‌های جدید و چت‌های قبلی -->
+        <div class="unread-container">
+            <h3 style="text-align: center; color: #003366; margin-bottom: 15px;">پیام‌های جدید</h3>
+            <div id="unread-list"></div>
+        
+            <h3 style="text-align: center; color: #f70000; margin-bottom: 15px;">چت‌های قبلی</h3>
+            <div id="old-chats-list"></div>
+        </div>
+    </div>
+
+    <!-- آیکن خروج ادمین -->
+    <div style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; background: #e74c3c; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 8px 20px rgba(231,76,60,0.4); cursor: pointer;" onclick="logoutAdmin()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="white" viewBox="0 0 24 24">
+            <path d="M16 13v-2H7V9l-5 4 5 4v-2z"/>
+            <path d="M20 3h-9c-1.1 0-2 .9-2 2v4h2V5h9v14h-9v-4H9v4c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+    </div>
+
+    <script>
+        // چک لاگین ادمین
+        if (localStorage.getItem('adminGoodLoggedIn') !== 'true') {
+            window.location.replace('index.html');
+        }
+
+        // کلید ذخیره‌سازی لوکال
+        const STORAGE_KEY = 'schoolAppData';
+
+        function getAppData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : { users: {}, chats: {} };
+        }
+
+        function saveAppData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        const disciplines = ['ساختمان', 'شبکه و نرم افزار', 'مکانیک خودرو', 'تأسیسات مکانیکی', 'حسابداری', 'الکتروتکنیک'];
+
+        let currentGrade = null;
+        let currentDiscipline = null;
+        let currentUserId = null;
+
+        // باز/بستن پایه‌ها
+        document.querySelectorAll('.grade-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const grade = btn.dataset.grade;
+
+                if (currentGrade === grade) {
+                    document.getElementById(`disciplines-${grade}`).style.display = 'none';
+                    document.getElementById(`users-${grade}`).style.display = 'none';
+                    btn.classList.remove('active');
+                    currentGrade = null;
+                } else {
+                    document.querySelectorAll('.discipline-list, .user-list').forEach(el => el.style.display = 'none');
+                    document.querySelectorAll('.grade-button').forEach(b => b.classList.remove('active'));
+
+                    showDisciplines(grade);
+                    btn.classList.add('active');
+                    currentGrade = grade;
+                }
+            });
+        });
+
+        // نمایش رشته‌ها
+        function showDisciplines(grade) {
+            const list = document.getElementById(`disciplines-${grade}`);
+            list.innerHTML = '';
+            list.style.display = 'block';
+
+            disciplines.forEach(disc => {
+                const btn = document.createElement('button');
+                btn.className = 'discipline-button';
+                btn.textContent = disc;
+                btn.onclick = () => {
+                    if (currentDiscipline === disc) {
+                        document.getElementById(`users-${grade}`).style.display = 'none';
+                        btn.classList.remove('active');
+                        currentDiscipline = null;
+                    } else {
+                        document.querySelectorAll('.discipline-button').forEach(b => b.classList.remove('active'));
+                        showUsers(grade, disc);
+                        btn.classList.add('active');
+                        currentDiscipline = disc;
+                    }
+                };
+                list.appendChild(btn);
+            });
+        }
+
+        // نمایش کاربران ثبت‌شده (از localStorage)
+        function showUsers(grade, discipline) {
+            const list = document.getElementById(`users-${grade}`);
+            list.innerHTML = '';
+            list.style.display = 'block';
+
+            const data = getAppData();
+            let found = false;
+
+            Object.keys(data.users).forEach(nationalCode => {
+                const user = data.users[nationalCode];
+                if (user.grade === grade && user.field && user.field.includes(discipline)) {
+                    found = true;
+                    const item = document.createElement('div');
+                    item.className = 'user-item';
+                    item.innerHTML = `
+                        <span>${user.fullName || 'بدون نام'} (${nationalCode})</span>
+                        <button class="delete-btn-small" onclick="deleteUser('${nationalCode}'); event.stopPropagation();">×</button>
+                    `;
+                    item.onclick = () => openChat(nationalCode, user.fullName || 'کاربر');
+                    list.appendChild(item);
+                }
+            });
+
+            if (!found) {
+                list.innerHTML = '<p style="text-align:center;color:#999;">هیچ کاربری در این رشته یافت نشد</p>';
+            }
+        }
+
+        // حذف کاربر (اختیاری)
+        function deleteUser(nationalCode) {
+            if (confirm('آیا مطمئن هستید این کاربر حذف شود؟')) {
+                const data = getAppData();
+                delete data.users[nationalCode];
+                delete data.chats[nationalCode];
+                saveAppData(data);
+                showUsers(currentGrade, currentDiscipline);
+            }
+        }
+
+        // باز کردن چت با کاربر
+        function openChat(userId, userName) {
+            currentUserId = userId;
+            document.getElementById('chat-header').textContent = `چت با ${userName}`;
+            document.getElementById('chat-input-field').disabled = false;
+            document.getElementById('send-message-btn').disabled = false;
+
+            loadChatMessages();
+        }
+
+        // لود پیام‌های چت
+        function loadChatMessages() {
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.innerHTML = '';
+
+            const data = getAppData();
+            const messages = data.chats[currentUserId] || [];
+
+            if (messages.length === 0) {
+                messagesDiv.innerHTML = '<div class="no-selection">هنوز پیامی ارسال نشده</div>';
+                return;
+            }
+
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `message from-${msg.from}`;
+                div.textContent = msg.text;
+                messagesDiv.appendChild(div);
+            });
+
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // ارسال پیام ادمین
+        document.getElementById('send-message-btn').addEventListener('click', () => {
+            const input = document.getElementById('chat-input-field');
+            const text = input.value.trim();
+            if (!text || !currentUserId) return;
+
+            const data = getAppData();
+            if (!data.chats[currentUserId]) data.chats[currentUserId] = [];
+
+            data.chats[currentUserId].push({
+                from: 'admin',
+                text,
+                timestamp: new Date().toISOString()
+            });
+
+            saveAppData(data);
+            input.value = '';
+            loadChatMessages();
+        });
+
+        document.getElementById('chat-input-field').addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('send-message-btn').click();
+            }
+        });
+
+        // پیام‌های جدید (کاربرانی که پیام unread دارند)
+        function loadUnreadChats() {
+            const list = document.getElementById('unread-list');
+            list.innerHTML = '';
+
+            const data = getAppData();
+            let hasUnread = false;
+
+            Object.keys(data.chats).forEach(chatId => {
+                const messages = data.chats[chatId];
+                const lastMsg = messages[messages.length - 1];
+
+                if (lastMsg && lastMsg.from === 'user') { // پیام جدید از کاربر
+                    hasUnread = true;
+                    const user = data.users[chatId] || { fullName: 'مهمان' };
+                    const displayName = user.fullName || chatId.substring(0, 10);
+
+                    const item = document.createElement('div');
+                    item.className = 'unread-item';
+                    item.innerHTML = `
+                        <span>${displayName}</span>
+                        <button class="delete-btn-small" onclick="deleteChat('${chatId}'); event.stopPropagation();">×</button>
+                    `;
+                    item.onclick = () => openChat(chatId, displayName);
+                    list.appendChild(item);
+                }
+            });
+
+            if (!hasUnread) {
+                list.innerHTML = '<p style="text-align:center;color:#999;">پیام جدیدی نیست</p>';
+            }
+        }
+
+        // چت‌های قبلی
+        function loadOldChats() {
+            const list = document.getElementById('old-chats-list');
+            list.innerHTML = '';
+
+            const data = getAppData();
+
+            Object.keys(data.chats).forEach(chatId => {
+                const messages = data.chats[chatId];
+                if (messages.length > 0) {
+                    const user = data.users[chatId] || { fullName: 'مهمان' };
+                    const displayName = user.fullName || chatId.substring(0, 10);
+
+                    const item = document.createElement('div');
+                    item.className = 'unread-item';
+                    item.style.background = '#f0f8ff';
+                    item.innerHTML = `
+                        <span>${displayName}</span>
+                        <button class="delete-btn-small" onclick="deleteChat('${chatId}'); event.stopPropagation();">×</button>
+                    `;
+                    item.onclick = () => openChat(chatId, displayName);
+                    list.appendChild(item);
+                }
+            });
+
+            if (list.children.length === 0) {
+                list.innerHTML = '<p style="text-align:center;color:#999;">چت قبلی وجود ندارد</p>';
+            }
+        }
+
+        // حذف چت
+        function deleteChat(chatId) {
+            if (confirm('آیا مطمئن هستید این چت حذف شود؟')) {
+                const data = getAppData();
+                delete data.chats[chatId];
+                saveAppData(data);
+                loadUnreadChats();
+                loadOldChats();
+                if (currentUserId === chatId) {
+                    document.getElementById('chat-header').textContent = 'یک کاربر انتخاب کنید';
+                    document.getElementById('chat-messages').innerHTML = '<div class="no-selection">برای شروع چت، یک کاربر از لیست انتخاب کنید</div>';
+                    document.getElementById('chat-input-field').disabled = true;
+                    document.getElementById('send-message-btn').disabled = true;
+                    currentUserId = null;
+                }
+            }
+        }
+
+        // خروج ادمین
+        function logoutAdmin() {
+            if (confirm('آیا مطمئن هستید که می‌خواهید خارج شوید؟')) {
+                localStorage.removeItem('adminGoodLoggedIn');
+                window.location.href = './index.html';
+            }
+        }
+
+        // لود اولیه
+        loadUnreadChats();
+        loadOldChats();
+    </script>
+</body>
+</html>
