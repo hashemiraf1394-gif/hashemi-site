@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
+    <title>login</title>
+    <link rel="shortcut icon" href="./logo.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="background: linear-gradient(135deg, #0f3460, #00D084); font-family: 'Vazirmatn', sans-serif; margin: 0; padding: 15px; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: white;">
+
+    <style>
+        /* دکمه‌های ورود و ثبت‌نام */
+        .login-btn {
+            flex: 1;
+            padding: 14px 20px;
+            font-size: 17px;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        #signup-btn {
+            background: linear-gradient(135deg, #00D084, #00b36b);
+            color: white;
+        }
+
+        #signup-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 208, 132, 0.4);
+        }
+
+        #login-btn {
+            background: linear-gradient(135deg, #003366, #004080);
+            color: white;
+        }
+
+        #login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 51, 102, 0.3);
+        }
+
+        /* آیکن پشتیبانی */
+        .support-icon {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 9999;
+            background: #00D084;
+            color: white;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 25px rgba(0, 208, 132, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .support-icon:hover {
+            transform: scale(1.12) rotate(10deg);
+            box-shadow: 0 15px 35px rgba(0, 208, 132, 0.6);
+        }
+
+        /* کادر چت پشتیبانی - بالای آیکن */
+        #support-modal {
+            position: fixed;
+            bottom: 110px;           /* دقیقاً بالای آیکن */
+            left: 30px;
+            width: 360px;
+            max-height: 65vh;
+            background: transparent;
+            z-index: 10000;
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #support-modal.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .support-modal .modal-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 -12px 35px rgba(0,0,0,0.25);
+            overflow: hidden;
+            border: 1px solid rgba(0, 208, 132, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* هدر چت */
+        .modal-box h2 {
+            margin: 0;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #00D084, #00b36b);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        /* پیام‌ها */
+        #support-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        /* استایل پیام‌ها - دوطرفه */
+        .message {
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #00D084;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.admin {
+            background: #e0e0e0;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* ورودی پیام */
+        .input-area {
+            display: flex;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        #support-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 1.5px solid #ddd;
+            border-radius: 30px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        #send-support-btn {
+            margin-left: 10px;
+            background: #00D084;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #send-support-btn:hover {
+            background: #00b36b;
+            transform: scale(1.1);
+        }
+
+        /* دکمه بستن */
+        .close {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            font-size: 32px;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* ریسپانسیو */
+        @media (max-width: 480px) {
+            #support-modal {
+                bottom: 90px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-height: 60vh;
+            }
+        
+            .support-icon {
+                bottom: 20px;
+                left: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 28px;
+            }
+        }
+
+        /* بارش برف - فقط روی بک‌گراند اصلی */
+        .snow-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .snowflake {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            box-shadow: 0 0 6px rgba(255,255,255,0.9);
+            animation: fall linear infinite;
+            top: -20px;
+        }
+
+        /* انیمیشن افتادن برف */
+        @keyframes fall {
+            0% {
+                transform: translateY(-20vh) translateX(0vw) rotate(0deg);
+            }
+            100% {
+                transform: translateY(120vh) translateX(30vw) rotate(720deg);
+            }
+        }
+
+        /* تعداد دونه‌ها و موقعیت شروع (از بالا-راست) */
+        .snowflake:nth-child(1)  { left: 3%;  animation-duration: 7s;   animation-delay: 0s;   }
+        .snowflake:nth-child(2)  { left: 6%;  animation-duration: 6.5s; animation-delay: 0.4s; }
+        .snowflake:nth-child(3)  { left: 9%;  animation-duration: 8s;   animation-delay: 0.9s; }
+        .snowflake:nth-child(4)  { left: 12%; animation-duration: 5.8s; animation-delay: 1.3s; }
+        .snowflake:nth-child(5)  { left: 15%; animation-duration: 7.2s; animation-delay: 1.9s; }
+        .snowflake:nth-child(6)  { left: 18%; animation-duration: 6.8s; animation-delay: 0.6s; }
+        .snowflake:nth-child(7)  { left: 21%; animation-duration: 9s;   animation-delay: 2.6s; }
+        .snowflake:nth-child(8)  { left: 24%; animation-duration: 6.4s; animation-delay: 1.6s; }
+        .snowflake:nth-child(9)  { left: 27%; animation-duration: 8.2s; animation-delay: 3.1s; }
+        .snowflake:nth-child(10) { left: 30%; animation-duration: 7.5s; animation-delay: 1.0s; }
+        .snowflake:nth-child(11) { left: 33%; animation-duration: 7.8s; animation-delay: 2.3s; }
+        .snowflake:nth-child(12) { left: 36%; animation-duration: 6.2s; animation-delay: 1.8s; }
+        .snowflake:nth-child(13) { left: 39%; animation-duration: 8.5s; animation-delay: 3.6s; }
+        .snowflake:nth-child(14) { left: 42%; animation-duration: 9.2s; animation-delay: 4.1s; }
+        .snowflake:nth-child(15) { left: 45%; animation-duration: 6.8s; animation-delay: 0.5s; }
+        .snowflake:nth-child(16) { left: 48%; animation-duration: 7.4s; animation-delay: 2.9s; }
+        .snowflake:nth-child(17) { left: 51%; animation-duration: 8s;   animation-delay: 1.4s; }
+        .snowflake:nth-child(18) { left: 54%; animation-duration: 10s;  animation-delay: 4.6s; }
+        .snowflake:nth-child(19) { left: 57%; animation-duration: 7.2s; animation-delay: 0.8s; }
+        .snowflake:nth-child(20) { left: 60%; animation-duration: 8.8s; animation-delay: 3.3s; }
+        .snowflake:nth-child(21) { left: 63%; animation-duration: 6.6s; animation-delay: 2.2s; }
+        .snowflake:nth-child(22) { left: 66%; animation-duration: 9.2s; animation-delay: 5.1s; }
+        .snowflake:nth-child(23) { left: 69%; animation-duration: 7.8s; animation-delay: 1.7s; }
+        .snowflake:nth-child(24) { left: 72%; animation-duration: 8.4s; animation-delay: 3.9s; }
+        .snowflake:nth-child(25) { left: 75%; animation-duration: 6.4s; animation-delay: 0.9s; }
+        .snowflake:nth-child(26) { left: 78%; animation-duration: 9.5s; animation-delay: 4.4s; }
+        .snowflake:nth-child(27) { left: 81%; animation-duration: 7s;   animation-delay: 1.5s; }
+        .snowflake:nth-child(28) { left: 84%; animation-duration: 8.2s; animation-delay: 3.7s; }
+        .snowflake:nth-child(29) { left: 87%; animation-duration: 6.8s; animation-delay: 2.5s; }
+        .snowflake:nth-child(30) { left: 90%; animation-duration: 10s;  animation-delay: 5.6s; }
+        .snowflake:nth-child(31) { left: 93%; animation-duration: 7.2s; animation-delay: 0.7s; }
+        .snowflake:nth-child(32) { left: 96%; animation-duration: 8.5s; animation-delay: 4.9s; }
+        .snowflake:nth-child(33) { left: 98%; animation-duration: 6s;   animation-delay: 1.1s; }
+        .snowflake:nth-child(34) { left: 99%; animation-duration: 9s;   animation-delay: 4.2s; }
+        .snowflake:nth-child(35) { left: 4%;  animation-duration: 7.5s; animation-delay: 2.8s; }
+        .snowflake:nth-child(36) { left: 7%;  animation-duration: 8s;   animation-delay: 3.4s; }
+        .snowflake:nth-child(37) { left: 11%; animation-duration: 6.5s; animation-delay: 0.2s; }
+        .snowflake:nth-child(38) { left: 14%; animation-duration: 8.8s; animation-delay: 4.7s; }
+        .snowflake:nth-child(39) { left: 17%; animation-duration: 7s;   animation-delay: 1.9s; }
+        .snowflake:nth-child(40) { left: 19%; animation-duration: 9.2s; animation-delay: 5.3s; }
+
+        .snowflake.small  { width: 4px; height: 4px; }
+        .snowflake.large  { width: 8px; height: 8px; opacity: 0.95; }
+    </style>
+
+    <div class="snow-container">
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+
+    </div>
+
+    <div style="width: 100%; max-width: 380px;">
+        <!-- <div class="vpn-alert-box" style="background: rgba(255,255,0,0.2); padding: 12px; border-radius: 12px; margin-bottom: 15px; text-align: center; color: #333;">
+            <p>⚠️ این نسخه فقط برای تست لوکال است</p>
+        </div> -->
+
+        <div style="background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 28px; box-shadow: 0 12px 30px rgba(0,0,0,0.2); color: #333;">
+            <h2 style="text-align: center; color: #003366; margin-bottom: 20px; font-size: 24px; font-weight: 700;">ورود به سیستم</h2>
+            <div style="margin-bottom: 18px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 16px;">کد ملی</label>
+                <input type="text" id="national-code" placeholder="کد ملی خود را وارد کنید" maxlength="10" style="width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 30px; font-size: 17px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 18px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 16px;">رمز عبور</label>
+                <input type="password" id="password" placeholder="رمز عبور" style="width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 30px; font-size: 17px; box-sizing: border-box;">
+            </div>
+
+            <div style="text-align: center; margin: 16px 0; font-size: 15px;">
+                <a href="recovery.html" style="color: #003366; text-decoration: none; font-weight: 600;">بازیابی رمز عبور</a>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button id="signup-btn" class="login-btn">ثبت نام</button>
+                <button id="login-btn" class="login-btn">ورود</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="error-toast" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #c62828; color: white; padding: 16px 32px; border-radius: 30px; font-size: 16px; font-weight: 600; display: none; z-index: 1000;">
+        لطفاً همه فیلدها را پر کنید یا اطلاعات صحیح وارد کنید
+    </div>
+    <div id="success-toast" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #4caf50; color: white; padding: 16px 32px; border-radius: 30px; font-size: 16px; font-weight: 600; display: none; z-index: 1000;">
+        در حال انتقال به صفحه اصلی...
+    </div>
+
+    <!-- آیکن چت -->
+    <div class="support-icon" id="support-icon">🎧</div>
+
+    <!-- مدال چت -->
+    <div id="support-modal" class="support-modal">
+        <div class="modal-box">
+            <span class="close">×</span>
+            <h2 style="text-align: center;">پشتیبانی آنلاین</h2>
+            <p style="text-align:center;color:#666;font-size:14px;">پیام خود را بنویسید</p>
+            <div id="support-messages" class="messages-box"></div>
+            <div class="input-area">
+                <input type="text" id="support-input" placeholder="پیام...">
+                <button id="send-support-btn">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'schoolAppData';
+
+        function getAppData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : { users: {}, chats: {}, currentUser: null };
+        }
+        
+        function saveAppData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // اگر قبلاً لاگین کرده باشد
+        if (localStorage.getItem('userLoggedIn') === 'true') {
+            window.location.replace('main.html');
+        }
+
+        // ورود
+        document.getElementById('login-btn').addEventListener('click', () => {
+            const nationalCode = document.getElementById('national-code').value.trim();
+            const password = document.getElementById('password').value.trim();
+                
+            if (!nationalCode || !password) {
+                showToast('error', 'لطفاً همه فیلدها را پر کنید');
+                return;
+            }
+        
+            // چک ادمین ویژه (اولویت اول)
+            if (nationalCode === '1000000000' && password === 'naderi-far123') {
+                localStorage.setItem('adminGoodLoggedIn', 'true');  // برای پنل نادری
+                localStorage.setItem('adminLoggedIn', 'true');     // اگر پنل‌های دیگه هم داری
+                showToast('success', 'ورود به پنل ادمین نادری...');
+                setTimeout(() => {
+                    window.location.replace('admin-naderi.html');
+                }, 1200);
+                return;
+            }
+        
+            const data = getAppData();
+            const user = data.users[nationalCode];
+
+            if (user && user.password === password) {
+                data.currentUser = nationalCode;
+                saveAppData(data);
+                localStorage.setItem('nationalCode', nationalCode);
+                localStorage.setItem('userLoggedIn', 'true');
+                showToast('success', 'در حال انتقال به صفحه اصلی...');
+                setTimeout(() => window.location.replace('main.html'), 1500);
+            } else {
+                showToast('error', 'کد ملی یا رمز عبور اشتباه است');
+            }
+        });
+
+        // رفتن به ثبت‌نام
+        document.getElementById('signup-btn').addEventListener('click', () => {
+            window.location.href = 'signup.html';
+        });
+
+        function showToast(type, message) {
+            const toast = document.getElementById(type === 'error' ? 'error-toast' : 'success-toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2000);
+        }
+
+        // چت پشتیبانی لوکال
+        document.addEventListener('DOMContentLoaded', () => {
+            let guestId = localStorage.getItem('guestChatId');
+            if (!guestId) {
+                guestId = 'guest-' + Math.floor(100000 + Math.random() * 900000);
+                localStorage.setItem('guestChatId', guestId);
+            }
+
+            function openSupportChat() {
+                const modal = document.getElementById('support-modal');
+                if (modal) {
+                    modal.classList.add('show');
+                    loadSupportChat();
+                }
+            }
+
+            function loadSupportChat() {
+                const messagesDiv = document.getElementById('support-messages');
+                if (!messagesDiv) return;
+
+                const data = getAppData();
+                const chat = data.chats[guestId] || [];
+
+                messagesDiv.innerHTML = chat.length === 0 
+                    ? '<p style="text-align:center;color:#999;">حالا سوال یا مشکل خود را بپرسید 😊</p>'
+                    : '';
+
+                chat.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.style.marginBottom = '15px';
+                    div.style.padding = '12px 18px';
+                    div.style.borderRadius = '18px';
+                    div.style.maxWidth = '70%';
+                    div.style.wordWrap = 'break-word';
+
+                    if (msg.from === 'user') {
+                        div.style.background = '#00D084';
+                        div.style.color = 'white';
+                        div.style.marginLeft = 'auto';
+                    } else {
+                        div.style.background = '#e0e0e0';
+                        div.style.color = '#333';
+                        div.style.marginRight = 'auto';
+                    }
+
+                    div.textContent = msg.text;
+                    messagesDiv.appendChild(div);
+                });
+
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
+            function sendSupportMessage() {
+                const input = document.getElementById('support-input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                const data = getAppData();
+                if (!data.chats[guestId]) data.chats[guestId] = [];
+
+                data.chats[guestId].push({
+                    from: 'user',
+                    text,
+                    timestamp: new Date().toISOString()
+                });
+
+                saveAppData(data);
+                input.value = '';
+                loadSupportChat();
+            }
+
+            document.getElementById('support-icon').addEventListener('click', openSupportChat);
+            document.getElementById('send-support-btn').addEventListener('click', sendSupportMessage);
+            document.getElementById('support-input').addEventListener('keypress', e => {
+                if (e.key === 'Enter') sendSupportMessage();
+            });
+
+            document.querySelector('#support-modal .close').addEventListener('click', () => {
+                document.getElementById('support-modal').classList.remove('show');
+            });
+
+            document.getElementById('support-modal').addEventListener('click', e => {
+                if (e.target.id === 'support-modal') {
+                    document.getElementById('support-modal').classList.remove('show');
+                }
+            });
+        });
+    </script>
+
+
+</body>
+</html>
